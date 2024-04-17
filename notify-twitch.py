@@ -82,6 +82,18 @@ def get_json(streamer) -> dict:
     raise ValueError
 
 
+def network_test() -> bool:
+    """ Check connection """
+    for x in range(1, 5):
+        del x
+        try:
+            requests.get('https://twitch.tv', timeout=3)
+            return True
+        except requests.exceptions.ConnectionError:
+            time.sleep(3)
+    return False
+
+
 def main() -> None:
     """ Main function """
     args = get_args()
@@ -89,6 +101,10 @@ def main() -> None:
     cache_file = os.path.expanduser("~/.cache/notify-twitch.json")
 
     current_status = {streamer: {} for streamer in streamers}
+
+    # If a connection can't be established, skip scheduled loop
+    if not network_test():
+        return
 
     try:
         cache = cache_load(cache_file)
