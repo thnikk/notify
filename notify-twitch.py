@@ -8,23 +8,8 @@ import json
 import os
 import argparse
 import time
-from datetime import datetime, timedelta
 import requests
-
-
-class Schedule():
-    """ Schedule """
-    def __init__(self, mins):
-        self.time_diff = timedelta(minutes=mins)
-        self.start = datetime.now() - self.time_diff
-
-    def ready(self):
-        """ Check if ready"""
-        return (datetime.now() - self.start) > self.time_diff
-
-    def update(self):
-        """ Update current time """
-        self.start = datetime.now()
+from common import Schedule
 
 
 def get_args():
@@ -94,7 +79,7 @@ def network_test() -> bool:
     return False
 
 
-def main() -> None:
+def notify_twitch() -> None:
     """ Main function """
     args = get_args()
     streamers = get_streamer_list(os.path.expanduser('~/.config/streamers'))
@@ -130,15 +115,11 @@ def main() -> None:
     cache_save(cache_file, current_status)
 
 
-def scheduler():
+def main():
     """ Schedule loop """
     sched = Schedule(5)
-    while True:
-        if sched.ready():
-            main()
-            sched.update()
-        time.sleep(1)
+    sched.loop(notify_twitch)
 
 
 if __name__ == "__main__":
-    scheduler()
+    main()
