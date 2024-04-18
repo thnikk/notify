@@ -109,10 +109,11 @@ def notify_twitch() -> None:
         except (KeyError, ValueError):
             notify(f"{streamer} is live!", strip_emojis(
                 current_status[streamer]['description']))
+            cache[streamer] = current_status[streamer]
 
         time.sleep(1)
 
-    cache_save(cache_file, current_status)
+    cache_save(cache_file, cache)
 
 
 def main():
